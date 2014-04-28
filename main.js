@@ -1,6 +1,6 @@
-$.get('data/cube.ply')
-.then(function (cow) {
-	var beef          = new ply(cow)
+$.get('data/pyramid.ply')
+.then(function (raw) {
+	var plyObj          = new ply(raw)
 	,   body          = document.body
 	,   domFaces      = []
 	,   domType       = 'tri'
@@ -10,29 +10,36 @@ $.get('data/cube.ply')
 	,   isoInverse    = isoTriangle.inverse()
 	,   tmpDom
 	,   tmpTransform
+	,   tmpColor
 	;
 
-	beef.faces.forEach(function (v, i) {
+	plyObj.faces.forEach(function (v, i) {
+		tmpColor = '#'+Math.floor(Math.random()*16777215).toString(16);
 		tmpDom = document.createElement(domType);
 		tmpDom.setAttribute('data-face', i);
+		console.log(v);
 		tmpTransform = isoInverse.multiply($M([
-			beef.vertices[v[1]].concat(1),
-			beef.vertices[v[2]].concat(1),
-			beef.vertices[v[3]].concat(1),
+			plyObj.vertices[v[1]].concat(1),
+			plyObj.vertices[v[2]].concat(1),
+			plyObj.vertices[v[3]].concat(1),
 			[1,1,1,1]
 		]));
 		//tmpDom.setAttribute('data-transform', tmpTransform.elements);
-		tmpDom.style.webkitTransform = 'matrix3d(' + Array.prototype.concat.apply([],tmpTransform.elements).map(function(v) {return v*10;}).toString() + ')';
+		//tmpDom.style.webkitTransformOrigin = '0 0 0';
+		tmpDom.style.borderTop = '20px solid ' + tmpColor;
+		tmpDom.style.borderLeft = '20px solid ' + tmpColor;
+		tmpDom.style.webkitTransform = 'matrix3d(' + Array.prototype.concat.apply([],tmpTransform.elements).map(function(v) {return v;}).toString() + ')';
+		tmpDom.style.webkitTransition = 'transform 2s ease-in';
 		tmpDom.innerHTML = 'a';
 		domFaces.push(tmpDom);
 		container.appendChild(tmpDom);
 	});
 
-	container.style.webkitTransformOrigin = "0 0 0";
-	container.style.webkitTransform = 'translate3d(40px, 40px, 40px) rotateX(38deg) rotateZ(30deg)';
-	container.style.webKitPerspective = '160px';
+	container.style.webkitTransform = 'translate3d(200px, 200px, 40px) rotateX(47deg) rotateZ(336deg)';
+	container.style.webkitTransformOrigin = '0 0 0';
+	container.style.webkitPerspective = '0px';
 	// should I be using document fragments?
 	body.appendChild(container);
 
-	window.beef = beef;
+	window.plyObj = plyObj;
 });
