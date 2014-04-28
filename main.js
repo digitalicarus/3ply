@@ -11,7 +11,23 @@ $.get('data/pyramid.ply')
 	,   tmpDom
 	,   tmpTransform
 	,   tmpColor
+	,   vendors       = ['', 'webkit', 'moz', 'ms', 'o']
 	;
+
+	function setVendorProps (ele, prop, value) {
+		var caps = prop.charAt(0).toUpperCase() + prop.slice(1)
+		,   tmp  = ''
+		;
+
+		for ( i=0; i < vendors.length; i++ ) {
+			tmp = vendors[i] + ((vendors[i]==='') ? prop : caps);
+			if (ele.style.hasOwnProperty(tmp) || typeof ele.style[tmp] === 'string' /*Firefox*/) {
+				ele.style[tmp] = value;
+				break;
+			}
+		}
+	}
+
 
 	plyObj.faces.forEach(function (v, i) {
 		tmpColor = '#'+Math.floor(Math.random()*16777215).toString(16);
@@ -25,19 +41,21 @@ $.get('data/pyramid.ply')
 			[1,1,1,1]
 		]));
 		//tmpDom.setAttribute('data-transform', tmpTransform.elements);
-		//tmpDom.style.webkitTransformOrigin = '0 0 0';
 		tmpDom.style.borderTop = '20px solid ' + tmpColor;
 		tmpDom.style.borderLeft = '20px solid ' + tmpColor;
-		tmpDom.style.webkitTransform = 'matrix3d(' + Array.prototype.concat.apply([],tmpTransform.elements).map(function(v) {return v;}).toString() + ')';
-		tmpDom.style.webkitTransition = 'transform 2s ease-in';
+
+		setVendorProps(tmpDom, 'transform', 'matrix3d(' + Array.prototype.concat.apply([],tmpTransform.elements).map(function(v) {return v;}).toString() + ')'); 
+		setVendorProps(tmpDom, 'transformOrigin', '0 0 0');
+		
 		tmpDom.innerHTML = 'a';
 		domFaces.push(tmpDom);
 		container.appendChild(tmpDom);
 	});
 
-	container.style.webkitTransform = 'translate3d(200px, 200px, 40px) rotateX(47deg) rotateZ(336deg)';
-	container.style.webkitTransformOrigin = '0 0 0';
-	container.style.webkitPerspective = '0px';
+	setVendorProps(container, 'transform', 'translate3d(200px, 200px, 40px) rotateX(47deg) rotateZ(336deg)');
+	setVendorProps(container, 'transformOrigin', '0 0 0');
+	setVendorProps(container, 'perspective', '0px');
+
 	// should I be using document fragments?
 	body.appendChild(container);
 
